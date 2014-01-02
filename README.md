@@ -9,7 +9,7 @@ Use Cases
 
 * Lightweight communication with database from scripts
 
-I would recommend not putting the webserver on a public interface, instead have a public API with secure funtions that talk to jsondb as a backend.
+I would recommend not putting the webserver on a public interface, instead have a public API with secure functions that talk to jsondb as a backend.
 
 Build Requirements
 ------------------
