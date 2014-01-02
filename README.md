@@ -14,24 +14,33 @@ I would recommend not putting the webserver on a public interface, instead have 
 Build Requirements
 ------------------
 
-* Must have sbt (Simple-Build-Tool) installed
-
 * JDK 7
-
-* Python 3.3+ (Optional to run the example.py script)
 
 Demo
 ----
 
+The demo uses a Python script to talk to jsondb.. You'll need Python 3.3+ installed to run it.
+
 1. Startup the webserver (uses port 8080 by default)
 
-        $ sbt run
+        $ sbt/sbt run
   
 2. Run the example python script
 
         $ cd src/main/python
         $ python example.py
-  
+
+Deployment
+----------
+
+You can package everything into a single "uberjar":
+
+    $ sbt/sbt one-jar
+
+To run:
+
+    $ java -jar target/scala-2.10/jsondb_2.10-0.1.0-one-jar.jar
+
 Technology Used
 ---------------
 
