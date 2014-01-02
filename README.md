@@ -39,6 +39,8 @@ Technology Used
 
 * scalikejdbc - http://scalikejdbc.org/
 
+* tomcat jdbc-pool - http://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html
+
 * spray - http://spray.io
 
 * H2 (for demo database) - http://www.h2database.com/
