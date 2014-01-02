@@ -25,12 +25,12 @@ Demo
 
 1. Startup the webserver (uses port 8080 by default)
 
-  $ sbt run
+        $ sbt run
   
 2. Run the example python script
 
-  $ cd src/main/python
-  $ python example.py
+        $ cd src/main/python
+        $ python example.py
   
 Technology Used
 ---------------
