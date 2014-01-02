@@ -35,7 +35,10 @@ Demo
 Technology Used
 ---------------
 
-scala
-scalikejdbc
-spray
-H2 (for demo database)
+* scala - http://scala-lang.org
+
+* scalikejdbc - http://scalikejdbc.org/
+
+* spray - http://spray.io
+
+* H2 (for demo database) - http://www.h2database.com/
