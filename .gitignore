@@ -1,3 +1,7 @@
+#sbt
+target/
+
+
 *.py[cod]
 
 # C extensions
