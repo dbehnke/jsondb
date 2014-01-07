@@ -5,7 +5,7 @@ jsondb = JsonDB(config['uriprefix'], config['user'],
                 config['passwd'], config['auth_realm'])
 
 data = jsondb.query(
-    'SELECT * FROM INFORMATION_SCHEMA.HELP WHERE ID = ?', ["327"])
+    'SELECT * FROM INFORMATION_SCHEMA.HELP WHERE ID = ?', ["327"], ["string"])
 
 # data = jsondb.query(
 #    'SELECT * FROM INFORMATION_SCHEMA.HELP WHERE ID = ?', ["327"])
