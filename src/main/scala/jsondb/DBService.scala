@@ -92,15 +92,17 @@ trait DBService extends HttpService {
           import QueryJsonSupport._
           entity(as[QueryStatement]) { query => { 
             respondWithMediaType(`application/json`) {
-              try {
-                val x = Database.queryJSON('tomcat,
-                  sqls"${UnsafeSQLSyntax(query.sql,query.data)}",
-                  query.typedef)
-                complete(x)
-              } catch {
-                case e : Exception => {
-                  complete(BadRequest,JsObject(
-                    Map("status" -> JsString(e.getMessage))).compactPrint)
+              detach() {
+                try {
+                  val x = Database.queryJSON('tomcat,
+                    sqls"${UnsafeSQLSyntax(query.sql,query.data)}",
+                    query.typedef)
+                  complete(x)
+                } catch {
+                  case e : Exception => {
+                    complete(BadRequest,JsObject(
+                      Map("status" -> JsString(e.getMessage))).compactPrint)
+                  }
                 }
               }
             }
@@ -112,17 +114,18 @@ trait DBService extends HttpService {
           import ExecuteJsonSupport._
           entity(as[ExecuteStatement]) { statement => { 
             respondWithMediaType(`application/json`) {
-              try {
-                val x = Database.executeJSON('tomcat, 
-                sqls"${UnsafeSQLSyntax(statement.sql,statement.data)}")
-                complete(x)
-              } catch {
-                case e : Exception => {
-                  complete(BadRequest,JsObject(
-                    Map("status" -> JsString(e.getMessage))).compactPrint)
+              detach() {
+                try {
+                  val x = Database.executeJSON('tomcat, 
+                  sqls"${UnsafeSQLSyntax(statement.sql,statement.data)}")
+                  complete(x)
+                } catch {
+                  case e : Exception => {
+                    complete(BadRequest,JsObject(
+                      Map("status" -> JsString(e.getMessage))).compactPrint)
+                  }
                 }
               }
-              
             }
           }}
         }
@@ -132,15 +135,17 @@ trait DBService extends HttpService {
           import BatchDDLJsonSupport._
           entity(as[BatchStatement]) { bs => { 
             respondWithMediaType(`application/json`) {
-              try {
-                val x = Database.batchJSON('tomcat, 
-                sqls"${UnsafeSQLSyntax(bs.sql,Seq[String]())}", bs.data)
-                complete(x)
-              } catch {
-                case e : Exception => {
-                  complete(BadRequest,JsObject(
-                    Map("status" -> JsString(e.getMessage))).compactPrint)
-                  
+              detach() {
+                try {
+                  val x = Database.batchJSON('tomcat, 
+                  sqls"${UnsafeSQLSyntax(bs.sql,Seq[String]())}", bs.data)
+                  complete(x)
+                } catch {
+                  case e : Exception => {
+                    complete(BadRequest,JsObject(
+                      Map("status" -> JsString(e.getMessage))).compactPrint)
+                    
+                  }
                 }
               }
             }
