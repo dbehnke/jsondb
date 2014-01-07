@@ -32,6 +32,7 @@ class DBServiceActor extends Actor with DBService {
 
 case class QueryStatement(sql: String, typedef: Seq[String],
   data: Seq[String])
+case class ExecuteStatement(sql: String, data: Seq[String])
 case class BatchStatement(sql : String, data: Seq[Seq[String]])
 
 //case class Result(rows: List[Map[String,Any]])
@@ -43,6 +44,10 @@ case class BatchStatement(sql : String, data: Seq[Seq[String]])
 
 object QueryJsonSupport extends DefaultJsonProtocol {
    implicit val PortofolioFormats = jsonFormat3(QueryStatement)
+}
+
+object ExecuteJsonSupport extends DefaultJsonProtocol {
+   implicit val PortofolioFormats = jsonFormat2(ExecuteStatement)
 }
 
 object BatchDDLJsonSupport extends DefaultJsonProtocol {
@@ -104,8 +109,8 @@ trait DBService extends HttpService {
       } ~
       path("statement") {
         post {
-          import QueryJsonSupport._
-          entity(as[QueryStatement]) { statement => { 
+          import ExecuteJsonSupport._
+          entity(as[ExecuteStatement]) { statement => { 
             respondWithMediaType(`application/json`) {
               try {
                 val x = Database.executeJSON('tomcat, 
