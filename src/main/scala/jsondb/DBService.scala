@@ -30,7 +30,8 @@ class DBServiceActor extends Actor with DBService {
   def receive = runRoute(dbRoute)
 }
 
-case class QueryStatement(sql: String, data: Seq[String])
+case class QueryStatement(sql: String, typedef: Seq[String],
+  data: Seq[String])
 case class BatchStatement(sql : String, data: Seq[Seq[String]])
 
 //case class Result(rows: List[Map[String,Any]])
@@ -41,7 +42,7 @@ case class BatchStatement(sql : String, data: Seq[Seq[String]])
 //}
 
 object QueryJsonSupport extends DefaultJsonProtocol {
-   implicit val PortofolioFormats = jsonFormat2(QueryStatement)
+   implicit val PortofolioFormats = jsonFormat3(QueryStatement)
 }
 
 object BatchDDLJsonSupport extends DefaultJsonProtocol {
@@ -86,8 +87,17 @@ trait DBService extends HttpService {
           import QueryJsonSupport._
           entity(as[QueryStatement]) { query => { 
             respondWithMediaType(`application/json`) {
-              complete(Database.queryJSON('tomcat,
-                sqls"${UnsafeSQLSyntax(query.sql,query.data)}"))
+              try {
+                val x = Database.queryJSON('tomcat,
+                  sqls"${UnsafeSQLSyntax(query.sql,query.data)}",
+                  query.typedef)
+                complete(x)
+              } catch {
+                case e : Exception => {
+                  complete(BadRequest,JsObject(
+                    Map("status" -> JsString(e.getMessage))).compactPrint)
+                }
+              }
             }
           }}
         }

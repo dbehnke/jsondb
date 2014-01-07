@@ -1,10 +1,11 @@
 package jsondb
 
-import scala.collection.mutable.ListBuffer
-import scala.util.parsing.json._
-
 import scalikejdbc._, SQLInterpolation._
 import spray.json._
+
+import org.json4s._
+import org.json4s.native.JsonMethods._
+import scala.collection.mutable.ListBuffer
 
 object Database {
   def stageH2Pool = {
@@ -20,27 +21,46 @@ object Database {
     ConnectionPool.add('tomcat,"jdbc:h2:mem:hello", "user", "pass", settings)
   }
 
-  def queryJSON(dbpool : Any, s : SQLSyntax) : String = {
+  def queryJSON(dbpool : Any, s : SQLSyntax,
+   typedefs : Seq[String]) : String = {
     NamedDB(dbpool) readOnly { implicit session => {
-      var rowListBuffer = ListBuffer[JSONObject]()
+      val rowListBuffer = ListBuffer[JObject]()
       sql"${s}" foreach { rs => {
-          var colMap = Map[String, Any]()
-          (1 to rs.metaData.getColumnCount) foreach { i => {
+        rowListBuffer.append(JObject((
+          for (i <- 1 to rs.metaData.getColumnCount)
+          yield {
             val fieldname = rs.metaData.getColumnLabel(i)
-            val fieldvalue = rs.any(i)
-            colMap += (fieldname -> fieldvalue)
-          } }
-          rowListBuffer += JSONObject(colMap)
-        }
-      }
-      JSONArray(rowListBuffer.toList).toString
-    } }
+            //use string if no typedef defined 
+            val typedef = {
+              if (typedefs.length >= i) typedefs(i-1)
+              else "string"
+            }
+            val fieldvalue = typedef match {
+              case "string" => {
+                rs.stringOpt(i) match {
+                  case Some(t) => JString(t)
+                  case _ => JNull
+                }
+              }
+              case "int" => {
+                rs.intOpt(i) match {
+                  case Some(t) => JInt(t)
+                  case _ => JNull
+                }
+              }
+              case _ => JNull
+            }
+            (fieldname -> fieldvalue)
+          } ).toList))
+      } }
+      compact(render(JArray(rowListBuffer.toList)))
+    } } 
   }
 
   def executeJSON(dbpool : Any, s : SQLSyntax) : String = {
     NamedDB(dbpool) autoCommit { implicit session => {
       sql"${s}".execute.apply()
-      JSONObject(Map("status" -> "ok")).toString
+      compact(render(JObject(("status",JString("ok")))))
     } }
   }
 
@@ -48,7 +68,7 @@ object Database {
     batch : Seq[Seq[String]]) : String = {
     NamedDB(dbpool) localTx { implicit session => {
       sql"${s}".batch(batch: _*).apply()
-      JSONObject(Map("status" -> "ok")).toString
+      compact(render(JObject(("status",JString("ok")))))
     } }
   }
 }

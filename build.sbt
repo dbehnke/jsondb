@@ -13,6 +13,7 @@ resolvers += "spray repo" at "http://repo.spray.io"
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
+  "org.json4s" %% "json4s-native" % "3.2.6",
   "io.spray" % "spray-routing" % "1.2.0",
   "io.spray" % "spray-caching" % "1.2.0",
   "io.spray" % "spray-can" % "1.2.0",
