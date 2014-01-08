@@ -95,7 +95,7 @@ trait DBService extends HttpService {
             respondWithMediaType(`application/json`) {
               detach() {
                 try {
-                  val x = Database.queryJSON('tomcat,
+                  val x = Database.queryJSON("h2mem",
                     sqls"${UnsafeSQLSyntax(query.sql,query.data)}",
                     query.typedef)
                   complete(x)
@@ -117,7 +117,7 @@ trait DBService extends HttpService {
             respondWithMediaType(`application/json`) {
               detach() {
                 try {
-                  val x = Database.executeJSON('tomcat, 
+                  val x = Database.executeJSON("h2mem", 
                   sqls"${UnsafeSQLSyntax(statement.sql,statement.data)}")
                   complete(x)
                 } catch {
@@ -138,7 +138,7 @@ trait DBService extends HttpService {
             respondWithMediaType(`application/json`) {
               detach() {
                 try {
-                  val x = Database.batchJSON('tomcat, 
+                  val x = Database.batchJSON("h2mem", 
                   sqls"${UnsafeSQLSyntax(bs.sql,Seq[String]())}", bs.data,
                   bs.typedef)
                   complete(x)

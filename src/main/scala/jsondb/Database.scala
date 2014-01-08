@@ -9,17 +9,21 @@ import scala.collection.mutable.ListBuffer
 import org.joda.time._
 
 object Database {
-  def stageH2Pool = {
-    Class.forName("org.h2.Driver")
-
-    val settings = ConnectionPoolSettings(
+  def init(name: String, 
+    classname: String = "org.h2.Driver",
+    url: String = "jdbc:h2:mem:" + System.currentTimeMillis(), 
+    user: String = "user",
+    pass: String = "pass", 
+    settings: ConnectionPoolSettings = ConnectionPoolSettings(
       initialSize = 5,
       maxSize = 20,
       connectionTimeoutMillis = 3000L,
-      validationQuery = "select 1 from dual")
+      validationQuery = "select 1 from dual")) = {
 
-    implicit val factory = TomcatH2ConnectionPoolFactory
-    ConnectionPool.add('tomcat,"jdbc:h2:mem:hello", "user", "pass", settings)
+    Class.forName(classname)
+
+    implicit val factory = TomcatConnectionPoolFactory
+    ConnectionPool.add(name, classname+":::"+url, user, pass, settings)
   }
 
 /*

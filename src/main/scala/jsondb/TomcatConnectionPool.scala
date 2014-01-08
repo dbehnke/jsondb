@@ -3,7 +3,7 @@ package jsondb
 import java.sql.Connection
 import scalikejdbc._
 
-class TomcatH2ConnectionPool(
+class TomcatConnectionPool(
   override val url: String,
   override val user: String,
   password: String,
@@ -13,9 +13,11 @@ class TomcatH2ConnectionPool(
   
   //import org.apache.tomcat.jdbc.pool.PoolProperties
 
+  private[this] val classurl = url.split(":::")
+
   private[this] val _dataSource = new org.apache.tomcat.jdbc.pool.DataSource()
-  _dataSource.setUrl(url)
-  _dataSource.setDriverClassName("org.h2.Driver")
+  _dataSource.setUrl(classurl(1))
+  _dataSource.setDriverClassName(classurl(0))
   _dataSource.setUsername(user)
   _dataSource.setPassword(password)
   _dataSource.setInitialSize(settings.initialSize)
