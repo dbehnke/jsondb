@@ -52,8 +52,11 @@ case class JBool(value: Boolean) extends JValue
                 }
               }
               case "datetime" => {
-                rs.dateTimeOpt(i) match {
-                  case Some(t) => JString(t.toString)
+                rs.timestampOpt(i) match {
+                  case Some(t) => {
+                    val dt = new DateTime(t)
+                    JString(dt.toString)
+                  }
                   case _ => JNull
                 }
               }

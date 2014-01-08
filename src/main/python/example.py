@@ -1,6 +1,7 @@
 from config import config
 from jsondb import JsonDB
 from urllib.error import HTTPError
+from datetime import datetime
 
 jsondb = JsonDB(config['uriprefix'], config['user'],
                 config['passwd'], config['auth_realm'])
@@ -27,16 +28,17 @@ try:
     jsondb.statement(
         'CREATE TABLE IF NOT EXISTS TEST ("ID" IDENTITY, ' +
         '"TESTFIELD" VARCHAR, ' +
-        '"TESTFIELD2" VARCHAR, "TESTFIELD3" BIGINT)')
+        '"TESTFIELD2" VARCHAR, "TESTFIELD3" TIMESTAMP)')
 except HTTPError as e:
     print("error occured: (%d) %s" % (e.code, e.msg))
 
 
-typedef = ["string", "string", "long"]
+typedef = ["string", "string", "datetime"]
 data = [
-    ['cheese', 'cheddar', str(222)], ['cake', 'chocolate', str(3333)],
-    ['butter', 'smart balance', str(4444)],
-    ['cookies', 'windmill', str(5555)]]
+    ['cheese', 'cheddar', datetime.now().isoformat()],
+    ['cake', 'chocolate', datetime.now().isoformat()],
+    ['butter', 'smart balance', datetime.now().isoformat()],
+    ['cookies', 'windmill', datetime.now().isoformat()]]
 
 try:
     response = jsondb.batch(
@@ -46,9 +48,10 @@ except HTTPError as e:
     print("error occured: (%d) %s" % (e.code, e.msg))
 
 
+typedef = ["int", "string", "string", "datetime"]
 try:
     data = jsondb.query(
-        'SELECT * FROM TEST')
+        'SELECT * FROM TEST', [], typedef)
 except HTTPError as e:
     print("error occured: (%d) %s" % (e.code, e.msg))
 
