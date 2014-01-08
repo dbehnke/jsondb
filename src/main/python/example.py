@@ -39,7 +39,7 @@ data = [
     ['cookies', 'windmill', str(5555)]]
 
 try:
-    data = jsondb.batch(
+    response = jsondb.batch(
         'INSERT INTO TEST (TESTFIELD, TESTFIELD2, TESTFIELD3) ' +
         'VALUES (?, ?, ?)', data, typedef)
 except HTTPError as e:

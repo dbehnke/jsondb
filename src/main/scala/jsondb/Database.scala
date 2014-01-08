@@ -6,6 +6,7 @@ import spray.json._
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import scala.collection.mutable.ListBuffer
+import org.joda.time._
 
 object Database {
   def stageH2Pool = {
@@ -97,9 +98,21 @@ case class JBool(value: Boolean) extends JValue
   }
 
   def batchJSON(dbpool : Any, s : SQLSyntax, 
-    batch : Seq[Seq[String]]) : String = {
+    batch : Seq[Seq[String]], typedef: Seq[String]) : String = {
+    val xbatch: Seq[Seq[Any]] = (for (row <- batch) yield {
+      (for(i <- 0 to row.length - 1)
+      yield {
+        if (i <= typedef.length)
+          if (batch(i).equals("none")) None  
+          else typedef(i) match {
+            case "datetime" => new DateTime(row(i))
+            case _ => row(i).asInstanceOf[String] 
+          }
+        else row(i)
+      })
+    })
     NamedDB(dbpool) localTx { implicit session => {
-      sql"${s}".batch(batch: _*).apply()
+      sql"${s}".batch(xbatch: _*).apply()
       compact(render(JObject(("status",JString("ok")))))
     } }
   }
