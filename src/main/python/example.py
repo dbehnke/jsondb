@@ -25,7 +25,7 @@ except HTTPError as e:
 #    print("%s" % row['ID'])
 
 try:
-    jsondb.statement(
+    jsondb.execute(
         'CREATE TABLE IF NOT EXISTS TEST ("ID" IDENTITY, ' +
         '"TESTFIELD" VARCHAR, ' +
         '"TESTFIELD2" VARCHAR, "TESTFIELD3" TIMESTAMP)')
@@ -57,4 +57,4 @@ except HTTPError as e:
 
 #data = jsondb.query('SELECT * FROM TEST')
 
-#jsondb.statement('DROP TABLE TEST')
+#jsondb.execute('DROP TABLE TEST')

@@ -7,7 +7,7 @@ import spray.can.Http
 object Boot extends App {
 
   // initialize database
-  Database.init(name = "h2mem")
+  Database.init(name = "default")
 
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("on-spray-can")

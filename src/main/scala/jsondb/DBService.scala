@@ -31,10 +31,10 @@ class DBServiceActor extends Actor with DBService {
 }
 
 case class QueryStatement(sql: String, typedef: Seq[String],
-  data: Seq[String])
-case class ExecuteStatement(sql: String, data: Seq[String])
+  data: Seq[String], db: String)
+case class ExecuteStatement(sql: String, data: Seq[String], db: String)
 case class BatchStatement(sql : String, data: Seq[Seq[String]],
-  typedef: Seq[String])
+  typedef: Seq[String], db: String)
 
 //case class Result(rows: List[Map[String,Any]])
 //case class Result(rows: String)
@@ -44,15 +44,15 @@ case class BatchStatement(sql : String, data: Seq[Seq[String]],
 //}
 
 object QueryJsonSupport extends DefaultJsonProtocol {
-   implicit val PortofolioFormats = jsonFormat3(QueryStatement)
+   implicit val PortofolioFormats = jsonFormat4(QueryStatement)
 }
 
 object ExecuteJsonSupport extends DefaultJsonProtocol {
-   implicit val PortofolioFormats = jsonFormat2(ExecuteStatement)
+   implicit val PortofolioFormats = jsonFormat3(ExecuteStatement)
 }
 
 object BatchDDLJsonSupport extends DefaultJsonProtocol {
-  implicit val PortofolioFormats = jsonFormat3(BatchStatement)
+  implicit val PortofolioFormats = jsonFormat4(BatchStatement)
 }
 
 
@@ -95,7 +95,7 @@ trait DBService extends HttpService {
             respondWithMediaType(`application/json`) {
               detach() {
                 try {
-                  val x = Database.queryJSON("h2mem",
+                  val x = Database.queryJSON(query.db,
                     sqls"${UnsafeSQLSyntax(query.sql,query.data)}",
                     query.typedef)
                   complete(x)
@@ -110,14 +110,14 @@ trait DBService extends HttpService {
           }}
         }
       } ~
-      path("statement") {
+      path("execute") {
         post {
           import ExecuteJsonSupport._
           entity(as[ExecuteStatement]) { statement => { 
             respondWithMediaType(`application/json`) {
               detach() {
                 try {
-                  val x = Database.executeJSON("h2mem", 
+                  val x = Database.executeJSON(statement.db, 
                   sqls"${UnsafeSQLSyntax(statement.sql,statement.data)}")
                   complete(x)
                 } catch {
@@ -138,7 +138,7 @@ trait DBService extends HttpService {
             respondWithMediaType(`application/json`) {
               detach() {
                 try {
-                  val x = Database.batchJSON("h2mem", 
+                  val x = Database.batchJSON(bs.db, 
                   sqls"${UnsafeSQLSyntax(bs.sql,Seq[String]())}", bs.data,
                   bs.typedef)
                   complete(x)

@@ -36,8 +36,8 @@ class JsonDB(object):
     def Jsondb(self):
         return self
 
-    def query(self, sql, data=[], typedef=[]):
-        body = {"sql": sql, "data": data, "typedef": typedef}
+    def query(self, sql, data=[], typedef=[], db='default'):
+        body = {"sql": sql, "data": data, "typedef": typedef, "db": db}
         req = urllib.request.Request(
             self.uri + "/query", data=json.dumps(body).encode('utf-8'),
             headers={'Content-Type': 'application/json'})
@@ -47,10 +47,10 @@ class JsonDB(object):
         print("[DEBUG]: response body = %s" % body)
         return json.loads(body.decode('utf-8'))
 
-    def statement(self, sql, data=[]):
-        body = {"sql": sql, "data": data}
+    def execute(self, sql, data=[], db='default'):
+        body = {"sql": sql, "data": data, "db": db}
         req = urllib.request.Request(
-            self.uri + "/statement", data=json.dumps(body).encode('utf-8'),
+            self.uri + "/execute", data=json.dumps(body).encode('utf-8'),
             headers={'Content-Type': 'application/json'})
         print("[DEBUG]: request body = %s" % json.dumps(body))
         resp = urllib.request.urlopen(req)
@@ -58,8 +58,8 @@ class JsonDB(object):
         print("[DEBUG]: response body = %s" % body)
         return json.loads(body.decode('utf-8'))
 
-    def batch(self, sql, data, typedef=[]):
-        body = {"sql": sql, "data": data, "typedef": typedef}
+    def batch(self, sql, data, typedef=[], db='default'):
+        body = {"sql": sql, "data": data, "typedef": typedef, "db": db}
         req = urllib.request.Request(
             self.uri + "/batch", data=json.dumps(body).encode('utf-8'),
             headers={'Content-Type': 'application/json'})
