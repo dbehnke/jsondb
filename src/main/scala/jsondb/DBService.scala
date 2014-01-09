@@ -66,7 +66,7 @@ trait DBService extends HttpService {
   case class UserProfile(name: String)
 
   def getUserProfile(name: String, password: String): Option[UserProfile] = {
-    if (name == "admin" && password == "haxor!2013")
+    if (name == JsondbGlobal.httpUser && password == JsondbGlobal.httpPass)
       Some(UserProfile(s"$name"))
     else
       None
@@ -88,7 +88,7 @@ trait DBService extends HttpService {
   val dbRoute = {
     authenticate(BasicAuth(CustomUserPassAuthenticator, "db-security-realm"))
      { userProfile => {
-      path("query") {
+      path(JsondbGlobal.httpUrlPrefix / "query") {
         post {
           import QueryJsonSupport._
           entity(as[QueryStatement]) { query => { 
@@ -110,7 +110,7 @@ trait DBService extends HttpService {
           }}
         }
       } ~
-      path("execute") {
+      path(JsondbGlobal.httpUrlPrefix / "execute") {
         post {
           import ExecuteJsonSupport._
           entity(as[ExecuteStatement]) { statement => { 
@@ -131,7 +131,7 @@ trait DBService extends HttpService {
           }}
         }
       } ~
-      path("batch") {
+      path(JsondbGlobal.httpUrlPrefix / "batch") {
         post {
           import BatchDDLJsonSupport._
           entity(as[BatchStatement]) { bs => { 

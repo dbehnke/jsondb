@@ -8,6 +8,7 @@ object Boot extends App {
 
   // initialize database
   Database.initFromTypesafeConfig
+  JsondbGlobal.initFromTypesafeConfig
 
   // we need an ActorSystem to host our application in
   implicit val system = ActorSystem("on-spray-can")
@@ -16,5 +17,6 @@ object Boot extends App {
   val service = system.actorOf(Props[DBServiceActor], "db-service")
 
   // start a new HTTP server on port 8080 with our service actor as the handler
-  IO(Http) ! Http.Bind(service, "localhost", port = 8080)
+  IO(Http) ! Http.Bind(service, JsondbGlobal.httpInterface,
+   port = JsondbGlobal.httpPort)
 }
