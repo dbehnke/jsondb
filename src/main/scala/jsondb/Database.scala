@@ -2,11 +2,12 @@ package jsondb
 
 import scalikejdbc._, SQLInterpolation._
 import spray.json._
-
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import scala.collection.mutable.ListBuffer
 import org.joda.time._
+import com.typesafe.config._
+import scala.collection.JavaConversions._
 
 object Database {
   def init(name: String, 
@@ -26,6 +27,30 @@ object Database {
     ConnectionPool.add(name, classname+":::"+url, user, pass, settings)
   }
 
+  def initFromTypesafeConfig {
+    val conf = ConfigFactory.load
+    val dbConfigs = conf.getConfig("jsondb.db")
+    dbConfigs.root().toSeq.foreach { db => {
+      val name = db._1
+      val dbconfig = conf.getConfig("jsondb.db."+name)
+      val active = dbconfig.getBoolean("active")
+      if (active) {
+        val classname = dbconfig.getString("classname")
+        val url = dbconfig.getString("url")
+        val user = dbconfig.getString("user")
+        val pass = dbconfig.getString("pass")
+        val poolconfig = conf.getConfig("jsondb.db."+name+".poolsettings")
+        val initialSize = poolconfig.getInt("initialSize")
+        val maxSize = poolconfig.getInt("maxSize")
+        val connectionTimeoutMillis = 
+          poolconfig.getLong("connectionTimeoutMillis")
+        val validationQuery = poolconfig.getString("validationQuery")
+        val settings = ConnectionPoolSettings(initialSize, maxSize,
+          connectionTimeoutMillis, validationQuery)
+        init(name, classname, url, user, pass, settings)
+      }
+    }}
+  }
 /*
 case class JString(s: String) extends JValue
 case class JDouble(num: Double) extends JValue
