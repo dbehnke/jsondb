@@ -1,7 +1,11 @@
 jsondb
 ======
 
+*Disclaimer: This is just a proof of concept
+
 Create an HTTP interface to any JDBC capable database - Uses JSON requests and responses
+
+Provides a non-validating access to the database, with basic authentication.  It's meant to be used as a layer between mid-tier and the database.  You shouldn't allow access to the jsondb application directly except for testing.
 
 
 Use Cases
